@@ -57,7 +57,7 @@ namespace UT3ServerManager
         bool ShouldAdvertise = false;
         bool LanMatch = true;
         bool AllowJoinInProgress = true;
-        bool UsesArbitration = true;
+        bool UsesArbitration = false;
         bool UsesStats = false;
         bool UsesPresence = false;
         bool AllowJoinViaPresence = true;
