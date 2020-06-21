@@ -1,0 +1,1 @@
+Enter any (legit or not) details for GameSpy or select LAN, otherwise you will not be able to connect to the server.

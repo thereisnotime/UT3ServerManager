@@ -1,0 +1,12 @@
+Useful sites that provide launch options, gamepad play, split screen, patches, server tweaks, game tweaks and more:
+https://wiki.unrealadmin.org/Commandline_Parameters_%28UT3%29
+https://unrealbyfusilade.wordpress.com/unreal-development-tutorials/unreal-tournament-games/ut3-specific/unreal-tournament-3-server-installation-guide/
+https://www.epicgames.com/unrealtournament/forums/past-unreal-tournament-games/unreal-tournament-3/4547-ut3-ultimate-installation-guide
+http://thepizzy.net/blog/2008/01/how-to-setup-a-ut3-internet-server/
+https://forums.epicgames.com/unreal-tournament-3/server-administration-aa/158120-how-to-setup-a-ut3-server-webadmin-and-troubleshoot
+http://wiki.unrealadmin.org/FAQ:UT3
+https://ut3webadmin.elmuerte.com/
+https://www.pcgamingwiki.com/wiki/Unreal_Tournament_3
+https://forums.epicgames.com/unreal-tournament-3/troubleshooting-technology-aa/131803-ultron-s-ut3-tweaks
+https://tweakguides.pcgamingwiki.com/UT3_1.html
+https://forums.epicgames.com/unreal-tournament-3/user-maps-mods-aa/full-releases-aa/288913-foxmod-v0-8-improved-ai-widescreen-support-4-player-splitscreen-gamepad-support

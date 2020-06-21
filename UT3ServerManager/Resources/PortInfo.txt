@@ -1,0 +1,27 @@
+Main Ports:
+
+6500 UDP (Query)
+6515 UDP (Dplay UDP)
+7777 UDP (UT Server Default)
+13000 UDP (Port for UT3)
+13139 UDP (Custom UDP Pings)
+27900 UDP (Master Server UDP Heartbeat)
+3783 TCP (Voice)
+6667 TCP (IRC)
+28900 TCP (Master Server List Request)
+29900 TCP (GP Connection Manager)
+29901 TCP (GP Search Manager)
+
+Additional Ports:
+
+6667 TCP ???
+8777 TCP|UDP ???
+9777 TCP|UDP ???
+8000 TCP|UDP (Webadmin)
+42292 TCP|UDP ???
+7777-7788 TCP|UDP ???
+27000-28000 TCP|UDP ???
+29900-29901 TCP|UDP ???
+27900 TCP ???
+13000 TCP ???
+6500 TCP (GameTracker)

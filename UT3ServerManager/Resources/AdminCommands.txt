@@ -1,0 +1,21 @@
+After server login, you can use ~ for entering commands:
+
+AdminLogin – Logs you in as an admin
+AdminLogout – Logs you out of admin mode
+AdminRestartMap – Restarts the current map
+AdminChangeMap – Loads a different map (gametype will change too, depending on map)
+Admin addbots <#> – Adds number of bots
+Admin killbots – Removes all bots
+AdminPlayerList – Shows PlayerID of players
+Adminkick – Kicks player from current game
+Adminkickban – Kicks player from current game and bans player from reconnecting
+AdminForceVoiceMute – Blocks a player from sending voip to others
+AdminForceVoiceUnMute – Allows a player to resume sending voip to others
+AdminForceTextMute – Blocks a player from sending text to others
+AdminForceTextUnMute – Allows a player to resume sending text to others
+AdminPublishMapList – Overrides the server’s map list for the current game type with the one on the client that used the command
+
+Removing a restriction on a banned player can be done by modifying the utgame.ini file for the server. This is stored by default in the following location:
+C:\Documents and Settings\<Windows User Name>\My Documents\My Games\Unreal Tournament 3 Demo\UTGame\Config.
+
+Note that the goal and time limits will persist from the arguments used in the commandline when starting the server. This can lead to problems where a reasonable VCTF score limit of 3 will translate to a frag limit of 3 when when switching gametypes this way. Leaving those limits blank when starting the server will however use the defaults for the gametype. This allows some flexibility in switching gametypes using this command.
