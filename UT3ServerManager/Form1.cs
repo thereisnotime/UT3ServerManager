@@ -21,7 +21,6 @@ namespace UT3ServerManager
     {
         // TODO: Add few more options for:
         // configsubdir=
-        // game=
         // ServerDescription=
         // -log=server.log
         // GamePassword=
@@ -38,7 +37,7 @@ namespace UT3ServerManager
         string MapName = "";
         string GameSpyLogin = "";
         string GameSpyPassword = "";
-        string AdminPassword = "UT3b3stG4me";
+        string AdminPassword = "th3reisn0time";
         string NoHomeDir = " -nohomedir";
         string Unattended = "";
         string GameOverride = "UTGame.UTDeathmatch";
