@@ -112,6 +112,10 @@
             this.button16 = new System.Windows.Forms.Button();
             this.startGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.button17 = new System.Windows.Forms.Button();
+            this.button18 = new System.Windows.Forms.Button();
+            this.button19 = new System.Windows.Forms.Button();
+            this.button20 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -503,6 +507,10 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.button20);
+            this.groupBox3.Controls.Add(this.button19);
+            this.groupBox3.Controls.Add(this.button18);
+            this.groupBox3.Controls.Add(this.button17);
             this.groupBox3.Controls.Add(this.checkBox24);
             this.groupBox3.Controls.Add(this.checkBox23);
             this.groupBox3.Controls.Add(this.checkBox22);
@@ -709,9 +717,9 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(20, 200);
+            this.button2.Location = new System.Drawing.Point(163, 200);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(276, 28);
+            this.button2.Size = new System.Drawing.Size(133, 28);
             this.button2.TabIndex = 12;
             this.button2.Text = "Reload Maps";
             this.button2.UseVisualStyleBackColor = true;
@@ -1013,6 +1021,46 @@
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
             // 
+            // button17
+            // 
+            this.button17.Location = new System.Drawing.Point(20, 201);
+            this.button17.Name = "button17";
+            this.button17.Size = new System.Drawing.Size(32, 28);
+            this.button17.TabIndex = 34;
+            this.button17.Text = "M1";
+            this.button17.UseVisualStyleBackColor = true;
+            this.button17.Click += new System.EventHandler(this.button17_Click);
+            // 
+            // button18
+            // 
+            this.button18.Location = new System.Drawing.Point(55, 201);
+            this.button18.Name = "button18";
+            this.button18.Size = new System.Drawing.Size(32, 28);
+            this.button18.TabIndex = 35;
+            this.button18.Text = "M2";
+            this.button18.UseVisualStyleBackColor = true;
+            this.button18.Click += new System.EventHandler(this.button18_Click);
+            // 
+            // button19
+            // 
+            this.button19.Location = new System.Drawing.Point(90, 201);
+            this.button19.Name = "button19";
+            this.button19.Size = new System.Drawing.Size(32, 28);
+            this.button19.TabIndex = 36;
+            this.button19.Text = "M3";
+            this.button19.UseVisualStyleBackColor = true;
+            this.button19.Click += new System.EventHandler(this.button19_Click);
+            // 
+            // button20
+            // 
+            this.button20.Location = new System.Drawing.Point(128, 201);
+            this.button20.Name = "button20";
+            this.button20.Size = new System.Drawing.Size(32, 28);
+            this.button20.TabIndex = 37;
+            this.button20.Text = "C1";
+            this.button20.UseVisualStyleBackColor = true;
+            this.button20.Click += new System.EventHandler(this.button20_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1145,6 +1193,10 @@
         private System.Windows.Forms.Button button16;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem startGameToolStripMenuItem;
+        private System.Windows.Forms.Button button20;
+        private System.Windows.Forms.Button button19;
+        private System.Windows.Forms.Button button18;
+        private System.Windows.Forms.Button button17;
     }
 }
 

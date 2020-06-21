@@ -407,6 +407,18 @@ namespace UT3ServerManager
                 {
                     comboBox3.Items.Add(Path.GetFileNameWithoutExtension(allMaps[i]));
                 }
+                // Private maps
+                allMaps = Directory.GetFiles(GamePath + @"\UTGame\CookedPC\Private\Maps", "*.ut3", SearchOption.TopDirectoryOnly);
+                for (int i = 0; i < allMaps.Length; i++)
+                {
+                    comboBox3.Items.Add(Path.GetFileNameWithoutExtension(allMaps[i]));
+                }
+                // Private UT3G
+                allMaps = Directory.GetFiles(GamePath + @"\UTGame\CookedPC\UT3G\Maps", "*.ut3", SearchOption.TopDirectoryOnly);
+                for (int i = 0; i < allMaps.Length; i++)
+                {
+                    comboBox3.Items.Add(Path.GetFileNameWithoutExtension(allMaps[i]));
+                }
                 // Custom maps
                 var myDocs = Path.Combine(Environment.ExpandEnvironmentVariables("%userprofile%"), "Documents");
                 myDocs += @"\My Games\Unreal Tournament 3\UTGame\Unpublished\CookedPC\CustomMaps";
@@ -963,6 +975,28 @@ namespace UT3ServerManager
         private void startGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
             start_Game();
+        }
+
+        private void button17_Click(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\CookedPC\Maps");
+        }
+
+        private void button18_Click(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\CookedPC\Private\Maps");
+        }
+
+        private void button19_Click(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\CookedPC\UT3G\Maps");
+        }
+
+        private void button20_Click(object sender, EventArgs e)
+        {
+            var myDocs = Path.Combine(Environment.ExpandEnvironmentVariables("%userprofile%"), "Documents");
+            myDocs += @"\My Games\Unreal Tournament 3\UTGame\Unpublished\CookedPC\CustomMaps";
+            Process.Start(myDocs);
         }
     }
 }
