@@ -44,33 +44,33 @@ Windows 10 Home x64
 ``` 
 
 ### Todo ###
-Migrate everything to .NET Core.
-Remove junk code.
-Refactor to implement better coding standards and naming conventions.
-Add GUI options for configsubdir=, ServerDescription=, -log, GamePassword.
-Add configuration save on exit to a file in the same folder.
-Optimize state changes, no need for so much code.
-Proper naming of contorls.
-Implement regions and better formatting for easy readability.
-Apply a nice looking winforms theme or migrate to WPF.
-Make form scale well with virtual resolution.
-Move all functions to seprate classes (one for general system calls and one for game specific needs).
-Perhaps handle the UT3 window inside the form (redirect stdout, stderr) and add ability to inject commands.
-Add custom parameters for server and game launch.
+- Migrate everything to .NET Core.
+- Remove junk code.
+- Refactor to implement better coding standards and naming conventions.
+- Add GUI options for configsubdir=, ServerDescription=, -log, GamePassword.
+- Add configuration save on exit to a file in the same folder.
+- Optimize state changes, no need for so much code.
+- Proper naming of contorls.
+- Implement regions and better formatting for easy readability.
+- Apply a nice looking winforms theme or migrate to WPF.
+- Make form scale well with virtual resolution.
+- Move all functions to seprate classes (one for general system calls and one for game specific needs).
+- Perhaps handle the UT3 window inside the form (redirect stdout, stderr) and add ability to inject commands.
+- Add custom parameters for server and game launch.
 
 ### Uninstall ###
 Delete the executable.
 
 ### Helpful Resources ###
 If you want to improve UT3SM, add features or just tweak your game:
-https://wiki.unrealadmin.org/Commandline_Parameters_%28UT3%29
-https://unrealbyfusilade.wordpress.com/unreal-development-tutorials/unreal-tournament-games/ut3-specific/unreal-tournament-3-server-installation-guide/
-https://www.epicgames.com/unrealtournament/forums/past-unreal-tournament-games/unreal-tournament-3/4547-ut3-ultimate-installation-guide
-http://thepizzy.net/blog/2008/01/how-to-setup-a-ut3-internet-server/
-https://forums.epicgames.com/unreal-tournament-3/server-administration-aa/158120-how-to-setup-a-ut3-server-webadmin-and-troubleshoot
-http://wiki.unrealadmin.org/FAQ:UT3
-https://ut3webadmin.elmuerte.com/
-https://www.pcgamingwiki.com/wiki/Unreal_Tournament_3
-https://forums.epicgames.com/unreal-tournament-3/troubleshooting-technology-aa/131803-ultron-s-ut3-tweaks
-https://tweakguides.pcgamingwiki.com/UT3_1.html
-https://forums.epicgames.com/unreal-tournament-3/user-maps-mods-aa/full-releases-aa/288913-foxmod-v0-8-improved-ai-widescreen-support-4-player-splitscreen-gamepad-support
+- https://wiki.unrealadmin.org/Commandline_Parameters_%28UT3%29
+- https://unrealbyfusilade.wordpress.com/unreal-development-tutorials/unreal-tournament-games/ut3-specific/unreal-tournament-3-server-installation-guide/
+- https://www.epicgames.com/unrealtournament/forums/past-unreal-tournament-games/unreal-tournament-3/4547-ut3-ultimate-installation-guide
+- http://thepizzy.net/blog/2008/01/how-to-setup-a-ut3-internet-server/
+- https://forums.epicgames.com/unreal-tournament-3/server-administration-aa/158120-how-to-setup-a-ut3-server-webadmin-and-troubleshoot
+- http://wiki.unrealadmin.org/FAQ:UT3
+- https://ut3webadmin.elmuerte.com/
+- https://www.pcgamingwiki.com/wiki/Unreal_Tournament_3
+- https://forums.epicgames.com/unreal-tournament-3/troubleshooting-technology-aa/131803-ultron-s-ut3-tweaks
+- https://tweakguides.pcgamingwiki.com/UT3_1.html
+- https://forums.epicgames.com/unreal-tournament-3/user-maps-mods-aa/full-releases-aa/288913-foxmod-v0-8-improved-ai-widescreen-support-4-player-splitscreen-gamepad-support
