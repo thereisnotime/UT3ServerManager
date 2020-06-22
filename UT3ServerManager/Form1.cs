@@ -14,6 +14,7 @@ using Microsoft.Win32;
 using System.Xml;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Configuration;
 
 namespace UT3ServerManager
 {
@@ -33,38 +34,42 @@ namespace UT3ServerManager
         // TODO: Make form scale well with virtual resolution.
         // TODO: Move all functions to seprate classes (one for general system calls and one for game specific).
 
-        string GamePath;
-        string MapName = "";
-        string GameSpyLogin = "";
-        string GameSpyPassword = "";
-        string AdminPassword = "th3reisn0time";
-        string NoHomeDir = " -nohomedir";
-        string Unattended = "";
-        string GameOverride = "UTGame.UTDeathmatch";
-        string Mutators = "";
+        string GamePath = Properties.Settings.Default.GamePath;
+        string MapName = Properties.Settings.Default.MapName;
+        string GameSpyLogin = Properties.Settings.Default.GameSpyLogin;
+        string GameSpyPassword = Properties.Settings.Default.GameSpyPassword;
+        string AdminPassword = Properties.Settings.Default.AdminPassword;
+        string NoHomeDir = Properties.Settings.Default.NoHomeDir;
+        string Unattended = Properties.Settings.Default.Unattended;
+        string GameOverride = Properties.Settings.Default.GameOverride;
+        string Mutators = Properties.Settings.Default.Mutators;
+        string ServerInsideParameters = Properties.Settings.Default.ServerInsideParameters;
+        string ServerOutsideArguments = Properties.Settings.Default.ServerOutsideArguments;
+        string GameLaunchArguments = Properties.Settings.Default.GameLaunchArguments;
         string ServerParameters;
-        int VoteDuration = 45;
-        int GameMode = 0;
-        int NumPlay = 10;
-        int BotSkill = 4;
-        int ServerPort = 40777;
-        int MaxPlayers = 32;
-        int MinNetPlayers = 1;
-        int TimeLimit = 50;
-        int GoalScore = 100;
-        bool AllowMapVoting = true;
-        bool AllowInvites = true;
-        bool ShouldAdvertise = false;
-        bool LanMatch = true;
-        bool AllowJoinInProgress = true;
-        bool UsesArbitration = false;
-        bool UsesStats = false;
-        bool UsesPresence = false;
-        bool AllowJoinViaPresence = true;
-        bool ForceRespawn = true;
-        bool PureServer = false;
-        bool Dedicated = true;
-        double VsBots = 1.0;
+        int VoteDuration = Properties.Settings.Default.VoteDuration;
+        int GameMode = Properties.Settings.Default.GameMode;
+        int NumPlay = Properties.Settings.Default.NumPlay;
+        int BotSkill = Properties.Settings.Default.BotSkill;
+        int ServerPort = Properties.Settings.Default.ServerPort;
+        int MaxPlayers = Properties.Settings.Default.MaxPlayers;
+        int MinNetPlayers = Properties.Settings.Default.MinNetPlayers;
+        int TimeLimit = Properties.Settings.Default.TimeLimit;
+        int GoalScore = Properties.Settings.Default.GoalScore;
+        bool AllowMapVoting = Properties.Settings.Default.AllowMapVoting;
+        bool AllowInvites = Properties.Settings.Default.AllowInvites;
+        bool ShouldAdvertise = Properties.Settings.Default.ShouldAdvertise;
+        bool LanMatch = Properties.Settings.Default.LanMatch;
+        bool AllowJoinInProgress = Properties.Settings.Default.AllowJoinInProgress;
+        bool UsesArbitration = Properties.Settings.Default.UsesArbitration;
+        bool UsesStats = Properties.Settings.Default.UsesStats;
+        bool UsesPresence = Properties.Settings.Default.UsesPresence;
+        bool AllowJoinViaPresence = Properties.Settings.Default.AllowJoinViaPresence;
+        bool ForceRespawn = Properties.Settings.Default.ForceRespawn;
+        bool PureServer = Properties.Settings.Default.PureServer;
+        bool Dedicated = Properties.Settings.Default.Dedicated;
+        bool MutatorsCanRun = false; // TODO: fix me when not sleep depervated
+        double VsBots = Properties.Settings.Default.VsBots;
  
 
         public Form1()
@@ -211,19 +216,41 @@ namespace UT3ServerManager
             }
         }
 
-        private void start_Server()
+        private void kill_Game()
+        {
+            log("Stopping all UT3 game processes...", "INFO");
+            try
+            {
+                foreach (var process in Process.GetProcessesByName("UT3"))
+                {
+                    if (!process.MainWindowTitle.Contains(" players)")) process.Kill();
+                }
+            }
+            catch (Exception ex)
+            {
+                log("Killing game: " + ex.Message, "ERR");
+            }
+        }
+
+        private void start_Server(bool debugMode = false)
         {
             log("Starting UT3 server...", "INFO");
+            if (ServerInsideParameters.Length > 0) ServerInsideParameters = "" + ServerInsideParameters;
+            if (ServerOutsideArguments.Length > 0) ServerOutsideArguments = " " + ServerOutsideArguments;
+            if (GameSpyLogin.Length > 0) GameSpyLogin = " -login=" + GameSpyLogin;
+            if (GameSpyPassword.Length > 0) GameSpyPassword = " -password=" + GameSpyPassword;
+            // TODO: Refactor this mess.
             ServerParameters = "server " + MapName + "?" + "numplay=" + NumPlay + "?maxplayers=" + MaxPlayers + "?timelimit=" + TimeLimit + "?goalscore=" + GoalScore +
                 "?vsbots=" + VsBots + "?forcerespawn=" + ForceRespawn + "?GameMode=" + GameMode + "?PureServer=" + PureServer + "?minnetplayers=" + MinNetPlayers +
                 "?bIsDedicated=" + Dedicated + "?bUsesArbitration=" + UsesArbitration + "?bAllowJoinViaPresence=" + AllowJoinViaPresence + "?bUsesPresence=" + UsesPresence +
                 "?bAllowInvites=" + AllowInvites + "?bAllowJoinInProgress=" + AllowJoinInProgress + "?bUsesStats=" + UsesStats + "?bIsLanMatch=" + LanMatch +
                 "?bShouldAdvertise=" + ShouldAdvertise + "?bAllowJoinInProgress=" + AllowJoinInProgress + "?bUsesStats=" + UsesStats + "?bIsLanMatch=" + LanMatch +
                 "?AdminPassword=" + AdminPassword + "?game=" + GameOverride + Mutators +
-                "?botskill=" + BotSkill + GameSpyLogin + GameSpyPassword + " -port=" + ServerPort + NoHomeDir + Unattended;
+                "?botskill=" + BotSkill + ServerInsideParameters + GameSpyLogin + GameSpyPassword + " -port=" + ServerPort + NoHomeDir + Unattended + ServerOutsideArguments;
             textBox5.Text = ServerParameters;
             textBox12.Text = "open 127.0.0.1:" + ServerPort + "?password=" + AdminPassword;
             textBox13.Text = "open " + get_IP() + ":" + ServerPort;
+            if (debugMode) return;
             ProcessStartInfo startInfo = new ProcessStartInfo(GamePath + @"\Binaries\UT3.exe");
             startInfo.WindowStyle = ProcessWindowStyle.Normal;
             startInfo.Arguments = ServerParameters;
@@ -285,63 +312,60 @@ namespace UT3ServerManager
 
         private void get_Install_Directory()
         {
-            log("Searching for game directory...", "INFO");
-
-            string UT3Directory = string.Empty;
-
-            // Search standard Steam registry
-            UT3Directory = search_SteamRegistry();
-            if (UT3Directory.Length > 0)
+            if (Properties.Settings.Default.GamePath == "none") // dont judge
             {
-                log("Found game folder in registry " + UT3Directory, "INFO");
-                GamePath = UT3Directory;
+                log("Searching for game directory...", "INFO");
+                string UT3Directory = string.Empty;
+
+                // Search standard Steam registry
+                UT3Directory = search_SteamRegistry();
+                if (UT3Directory.Length > 0)
+                {
+                    log("Found game folder in registry " + UT3Directory, "INFO");
+                    GamePath = UT3Directory;
+                    textBox15.Text = GamePath;
+                    enable_Controls();
+                    load_Maps();
+                    Properties.Settings.Default.GamePath = GamePath;
+                    save_Settings();
+                    return;
+                }
+                // Search all Steam libraries
+                UT3Directory = search_Steam();
+                if (UT3Directory.Length > 0)
+                {
+                    log("Found game folder in Steam " + UT3Directory, "INFO");
+                    GamePath = UT3Directory;
+                    textBox15.Text = GamePath;
+                    enable_Controls();
+                    load_Maps();
+                    Properties.Settings.Default.GamePath = GamePath;
+                    save_Settings();
+                    return;
+                }
+                // Search standard standalone folders
+                UT3Directory = search_StandaloneFolders();
+                if (UT3Directory.Length > 0)
+                {
+                    log("Found game folder in standard folders " + UT3Directory, "INFO");
+                    GamePath = UT3Directory;
+                    textBox15.Text = GamePath;
+                    enable_Controls();
+                    load_Maps();
+                    Properties.Settings.Default.GamePath = GamePath;
+                    save_Settings();
+                    return;
+                }
+            }
+            else
+            {
+                log("Loading GamePath from config (" + GamePath + ")...", "INFO");
                 textBox15.Text = GamePath;
                 enable_Controls();
                 load_Maps();
                 return;
             }
-
-            // Search all Steam libraries
-            UT3Directory = search_Steam();
-            if (UT3Directory.Length > 0)
-            {
-                log("Found game folder in Steam " + UT3Directory, "INFO");
-                GamePath = UT3Directory;
-                textBox15.Text = GamePath;
-                enable_Controls();
-                load_Maps();
-                return;
-            }
-
-            // Search standard standalone folders
-            UT3Directory = search_StandaloneFolders();
-            if (UT3Directory.Length > 0)
-            {
-                log("Found game folder in standard folders " + UT3Directory, "INFO");
-                GamePath = UT3Directory;
-                textBox15.Text = GamePath;
-                enable_Controls();
-                load_Maps();
-                return;
-            }
-
-            // Installed programs
-            /* string registry_key = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
-             using (Microsoft.Win32.RegistryKey key = Registry.LocalMachine.OpenSubKey(registry_key))
-             {
-                 foreach (string subkey_name in key.GetSubKeyNames())
-                 {
-                     using (RegistryKey subkey = key.OpenSubKey(subkey_name))
-                     {
-                         Console.WriteLine(subkey.GetValue("DisplayName"));
-                     }
-                 }
-             }*/
-
-
-
-            // Check steam
-            // ask user 
+            
             log("Could not find game folder in standard locations, please select it manually.", "ERR");
         }
 
@@ -400,24 +424,24 @@ namespace UT3ServerManager
         {
             try
             {
-                comboBox3.Items.Clear();
+                cbMapName.Items.Clear();
                 // Original maps
                 string[] allMaps = Directory.GetFiles(GamePath + @"\UTGame\CookedPC\Maps", "*.ut3", SearchOption.TopDirectoryOnly);
                 for (int i = 0; i < allMaps.Length; i++)
                 {
-                    comboBox3.Items.Add(Path.GetFileNameWithoutExtension(allMaps[i]));
+                    cbMapName.Items.Add(Path.GetFileNameWithoutExtension(allMaps[i]));
                 }
                 // Private maps
                 allMaps = Directory.GetFiles(GamePath + @"\UTGame\CookedPC\Private\Maps", "*.ut3", SearchOption.TopDirectoryOnly);
                 for (int i = 0; i < allMaps.Length; i++)
                 {
-                    comboBox3.Items.Add(Path.GetFileNameWithoutExtension(allMaps[i]));
+                    cbMapName.Items.Add(Path.GetFileNameWithoutExtension(allMaps[i]));
                 }
                 // Private UT3G
                 allMaps = Directory.GetFiles(GamePath + @"\UTGame\CookedPC\UT3G\Maps", "*.ut3", SearchOption.TopDirectoryOnly);
                 for (int i = 0; i < allMaps.Length; i++)
                 {
-                    comboBox3.Items.Add(Path.GetFileNameWithoutExtension(allMaps[i]));
+                    cbMapName.Items.Add(Path.GetFileNameWithoutExtension(allMaps[i]));
                 }
                 // Custom maps
                 var myDocs = Path.Combine(Environment.ExpandEnvironmentVariables("%userprofile%"), "Documents");
@@ -427,11 +451,12 @@ namespace UT3ServerManager
                     allMaps = Directory.GetFiles(myDocs, "*.ut3", SearchOption.TopDirectoryOnly);
                     for (int i = 0; i < allMaps.Length; i++)
                     {
-                        comboBox3.Items.Add(Path.GetFileNameWithoutExtension(allMaps[i]));
+                        cbMapName.Items.Add(Path.GetFileNameWithoutExtension(allMaps[i]));
                     }
                 }
-                comboBox3.SelectedIndex = 0;
-                MapName = comboBox3.Text;
+                //cbMapName.SelectedIndex = 0;
+                cbMapName.SelectedIndex = cbMapName.Items.IndexOf(MapName);
+                MapName = cbMapName.Text;
             } 
             catch (Exception ex)
             {
@@ -449,25 +474,128 @@ namespace UT3ServerManager
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            AllowMapVoting = checkBox1.Checked;
+            AllowMapVoting = chkAllowMapVoting.Checked;
+            Properties.Settings.Default.AllowMapVoting = AllowMapVoting;
+            save_Settings();
         }
 
+        private void load_Settings()
+        {
+            // TopMost
+            checkBox25.Checked = Properties.Settings.Default.TopMost;
+            // Opacity
+            trackBar2.Value = (int)Properties.Settings.Default.Opacity;
+            this.Opacity = (double)Properties.Settings.Default.Opacity / 100.0;
+            // TimeLimit
+            txtTimeLimit.Text = TimeLimit.ToString();
+            // AllowMapVoting
+            chkAllowMapVoting.Checked = Properties.Settings.Default.AllowMapVoting;
+            // ForceRespawn
+            chkForceRespawn.Checked = Properties.Settings.Default.ForceRespawn;
+            // GoalScore
+            txtGoalScore.Text = GoalScore.ToString();
+            // MaxPlayers
+            txtMaxPlayers.Text = MaxPlayers.ToString();
+            // VoteDuration
+            txtVoteDuration.Text = VoteDuration.ToString();
+            // BotSkill
+            tbBotSkill.Value = BotSkill;
+            label2.Text = "Bot skill (" + BotSkill + "/7)";
+            // NumPlay
+            txtNumPlay.Text = NumPlay.ToString();
+            // MinNetPlayers
+            txtMinNetPlayers.Text = MinNetPlayers.ToString();
+            // VsBots
+            txtVsBots.Text = VsBots.ToString();
+            // Dedicated
+            chkDedicated.Checked = Properties.Settings.Default.Dedicated;
+            // PureServer
+            chkPureServer.Checked = Properties.Settings.Default.PureServer;
+            // ShouldAdvertise
+            chkShouldAdvertise.Checked = Properties.Settings.Default.ShouldAdvertise;
+            // UsesStats
+            chkUsesStats.Checked = Properties.Settings.Default.UsesStats;
+            // GameSpyLogin
+            txtGameSpyLogin.Text = GameSpyLogin;
+            // GameSpyPassword
+            txtGameSpyPassword.Text = GameSpyPassword;
+            // AdminPassword
+            txtAdminPassword.Text = AdminPassword;
+            // ServerPort
+            txtServerPort.Text = ServerPort.ToString();
+            // LanMatch
+            chkLanMatch.Checked = Properties.Settings.Default.LanMatch;
+            // AllowJoinInProgress
+            chkAllowJoinInProgress.Checked = Properties.Settings.Default.AllowJoinInProgress;
+            // UsesArbitration
+            chkUsesArbitration.Checked = Properties.Settings.Default.UsesArbitration;
+            // AllowInvites
+            chkAllowInvites.Checked = Properties.Settings.Default.AllowInvites;
+            // Unattended
+            if (Properties.Settings.Default.Unattended == "")
+            {
+                chkUnattended.Checked = false;
+            }
+            else
+            {
+                chkUnattended.Checked = true;
+            }
+            // NoHomeDir
+            if (Properties.Settings.Default.NoHomeDir == "")
+            {
+                chkNoHomeDir.Checked = false;
+            }
+            else
+            {
+                chkNoHomeDir.Checked = true;
+            }
+            // GameMode (GameOverride - no need)
+            cbGameMode.SelectedIndex = GameMode;
+            // MapName
+            cbMapName.SelectedIndex = cbMapName.Items.IndexOf(MapName);
+            // AllowJoinViaPresence
+            chkAllowJoinViaPresence.Checked = Properties.Settings.Default.AllowJoinViaPresence;
+            // UsesPresence
+            chkUsesPresence.Checked = Properties.Settings.Default.UsesPresence;
+            // Mutators
+            chkInstagib.Checked = Properties.Settings.Default.Mutators.Contains("UTGame.UTMutator_Instagib");
+            chkBigHead.Checked = Properties.Settings.Default.Mutators.Contains("UTGame.UTMutator_BigHead");
+            chkLowGravity.Checked = Properties.Settings.Default.Mutators.Contains("UTGame.UTMutator_LowGrav");
+            chkSuperBerserk.Checked = Properties.Settings.Default.Mutators.Contains("UTGame.UTMutator_SuperBerserk");
+            chkFriendlyFire.Checked = Properties.Settings.Default.Mutators.Contains("UTGame.UTMutator_FriendlyFire");
+            chkNoTranslocator.Checked = Properties.Settings.Default.Mutators.Contains("UTGame.UTMutator_NoTranslocator");
+            chkSpeedFreak.Checked = Properties.Settings.Default.Mutators.Contains("UTGame.UTMutator_SpeedFreak");
+            chkHandicap.Checked = Properties.Settings.Default.Mutators.Contains("UTGame.UTMutator_Handicap");
+            chkNoPowerups.Checked = Properties.Settings.Default.Mutators.Contains("UTGame.UTMutator_NoPowerups");
+            chkSlomo.Checked = Properties.Settings.Default.Mutators.Contains("UTGame.UTMutator_Slomo");
+            chkWeaponReplacement.Checked = Properties.Settings.Default.Mutators.Contains("UTGame.UTMutator_WeaponReplacement");
+            chkWeaponRespawn.Checked = Properties.Settings.Default.Mutators.Contains("UTGame.UTMutator_WeaponsRespawn");
+            MutatorsCanRun = true;
+            // ServerInsideParameters
+            txtServerInsideParameters.Text = ServerInsideParameters;
+            // ServerOutsideArguments
+            txtServerOutsideArguments.Text = ServerOutsideArguments;
+            // GameLaunchArguments
+            txtGameLaunchArguments.Text = GameLaunchArguments;
+        }
         private void Form1_Load(object sender, EventArgs e)
         {
-            comboBox1.SelectedIndex = 0;
             disable_Controls();
-            log("UT3SM loaded successfully.", "INFO");
             get_Install_Directory();
+            load_Settings();
+            log("UT3SM loaded successfully.", "INFO");
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            VoteDuration = int.Parse(textBox1.Text);
+            VoteDuration = int.Parse(txtVoteDuration.Text);
+            Properties.Settings.Default.VoteDuration = VoteDuration;
+            save_Settings();
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            GameMode = comboBox1.SelectedIndex;
+            GameMode = cbGameMode.SelectedIndex;
             switch (GameMode)
             {
                 case 0:
@@ -489,6 +617,9 @@ namespace UT3ServerManager
                     GameOverride = "UTGame.UTDuelGame";
                     break;
             }
+            Properties.Settings.Default.GameOverride = GameOverride;
+            Properties.Settings.Default.GameMode = GameMode;
+            save_Settings();
         }
 
         private void textBox2_KeyPress(object sender, KeyPressEventArgs e)
@@ -501,12 +632,16 @@ namespace UT3ServerManager
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
-            ForceRespawn = checkBox2.Checked;
+            ForceRespawn = chkForceRespawn.Checked;
+            Properties.Settings.Default.ForceRespawn = ForceRespawn;
+            save_Settings();
         }
 
         private void checkBox3_CheckedChanged(object sender, EventArgs e)
         {
-            PureServer = checkBox3.Checked;
+            PureServer = chkPureServer.Checked;
+            Properties.Settings.Default.PureServer = PureServer;
+            save_Settings();
         }
 
         private void label3_Click(object sender, EventArgs e)
@@ -516,9 +651,15 @@ namespace UT3ServerManager
 
         private void textBox3_TextChanged(object sender, EventArgs e)
         {
-            TimeLimit = int.Parse(textBox3.Text);
+            TimeLimit = int.Parse(txtTimeLimit.Text);
+            Properties.Settings.Default.TimeLimit = TimeLimit;
+            save_Settings();
         }
 
+        private void save_Settings()
+        {
+            Properties.Settings.Default.Save();
+        }
         private void textBox3_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
@@ -537,66 +678,72 @@ namespace UT3ServerManager
 
         private void textBox4_TextChanged(object sender, EventArgs e)
         {
-            GoalScore = int.Parse(textBox4.Text);
+            GoalScore = int.Parse(txtGoalScore.Text);
+            Properties.Settings.Default.GoalScore = GoalScore;
+            save_Settings();
         }
 
         private void checkBox4_CheckedChanged(object sender, EventArgs e)
         {
-            Dedicated = checkBox4.Checked;
+            Dedicated = chkDedicated.Checked;
+            Properties.Settings.Default.Dedicated = Dedicated;
+            save_Settings();
         }
 
         private void textBox6_TextChanged(object sender, EventArgs e)
         {
-            if (textBox6.Text.Length > 0)
-            {
-                GameSpyLogin = " -login=" + textBox6.Text;
-            }
-            else
-            {
-                GameSpyLogin = "";
-            }
+            GameSpyLogin = txtGameSpyLogin.Text;
+            Properties.Settings.Default.GameSpyLogin = GameSpyLogin;
+            save_Settings();
         }
 
         private void textBox7_TextChanged(object sender, EventArgs e)
         {
-            if (textBox7.Text.Length > 0)
-            {
-                GameSpyPassword = " -password=" + textBox7.Text;
-            }
-            else
-            {
-                GameSpyPassword = "";
-            }
+            GameSpyPassword =txtGameSpyPassword.Text;
+            Properties.Settings.Default.GameSpyPassword = GameSpyPassword;
+            save_Settings();
         }
 
         private void checkBox5_CheckedChanged(object sender, EventArgs e)
         {
-            AllowInvites = checkBox5.Checked;
+            AllowInvites = chkAllowInvites.Checked;
+            Properties.Settings.Default.AllowInvites = AllowInvites;
+            save_Settings();
         }
 
         private void checkBox6_CheckedChanged(object sender, EventArgs e)
         {
-            LanMatch = checkBox6.Checked;
+            LanMatch = chkLanMatch.Checked;
+            Properties.Settings.Default.LanMatch = LanMatch;
+            save_Settings();
         }
 
         private void checkBox7_CheckedChanged(object sender, EventArgs e)
         {
-            UsesArbitration = checkBox7.Checked;
+            UsesArbitration = chkUsesArbitration.Checked;
+            Properties.Settings.Default.UsesArbitration = UsesArbitration;
+            save_Settings();
         }
 
         private void checkBox8_CheckedChanged(object sender, EventArgs e)
         {
-            AllowJoinInProgress = checkBox8.Checked;
+            AllowJoinInProgress = chkAllowJoinInProgress.Checked;
+            Properties.Settings.Default.AllowJoinInProgress = AllowJoinInProgress;
+            save_Settings();
         }
 
         private void checkBox9_CheckedChanged(object sender, EventArgs e)
         {
-            ShouldAdvertise = checkBox9.Checked;
+            ShouldAdvertise = chkShouldAdvertise.Checked;
+            Properties.Settings.Default.ShouldAdvertise = ShouldAdvertise;
+            save_Settings();
         }
 
         private void checkBox10_CheckedChanged(object sender, EventArgs e)
         {
-            UsesStats = checkBox10.Checked;
+            UsesStats = chkUsesStats.Checked;
+            Properties.Settings.Default.UsesStats = UsesStats;
+            save_Settings();
         }
 
         private void textBox8_KeyPress(object sender, KeyPressEventArgs e)
@@ -609,12 +756,16 @@ namespace UT3ServerManager
 
         private void textBox8_TextChanged(object sender, EventArgs e)
         {
-            MinNetPlayers = int.Parse(textBox8.Text);
+            MinNetPlayers = int.Parse(txtMinNetPlayers.Text);
+            Properties.Settings.Default.MinNetPlayers = MinNetPlayers;
+            save_Settings();
         }
 
         private void textBox9_TextChanged(object sender, EventArgs e)
         {
-            VsBots = double.Parse(textBox9.Text);
+            VsBots = double.Parse(txtVsBots.Text);
+            Properties.Settings.Default.VsBots = VsBots;
+            save_Settings();
         }
 
         private void textBox9_KeyPress(object sender, KeyPressEventArgs e)
@@ -633,7 +784,9 @@ namespace UT3ServerManager
 
         private void textBox10_TextChanged(object sender, EventArgs e)
         {
-            ServerPort = int.Parse(textBox10.Text);
+            ServerPort = int.Parse(txtServerPort.Text);
+            Properties.Settings.Default.ServerPort = ServerPort;
+            save_Settings();
         }
 
         private void textBox10_KeyPress(object sender, KeyPressEventArgs e)
@@ -651,12 +804,16 @@ namespace UT3ServerManager
 
         private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
         {
-            MapName = comboBox3.Text;
+            MapName = cbMapName.Text;
+            Properties.Settings.Default.MapName = MapName;
+            save_Settings();
         }
 
         private void textBox11_TextChanged(object sender, EventArgs e)
         {
-            MaxPlayers = int.Parse(textBox11.Text);
+            MaxPlayers = int.Parse(txtMaxPlayers.Text);
+            Properties.Settings.Default.MaxPlayers = MaxPlayers;
+            save_Settings();
         }
 
         private void textBox11_KeyPress(object sender, KeyPressEventArgs e)
@@ -689,7 +846,9 @@ namespace UT3ServerManager
 
         private void textBox14_TextChanged(object sender, EventArgs e)
         {
-            AdminPassword = textBox14.Text;
+            AdminPassword = txtAdminPassword.Text;
+            Properties.Settings.Default.AdminPassword = AdminPassword;
+            save_Settings();
         }
 
         private void button7_Click(object sender, EventArgs e)
@@ -724,7 +883,7 @@ namespace UT3ServerManager
 
         private void checkBox11_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox11.Checked)
+            if (chkNoHomeDir.Checked)
             {
                 NoHomeDir = " -nohomedir";
             }
@@ -732,11 +891,13 @@ namespace UT3ServerManager
             {
                 NoHomeDir = "";
             }
+            Properties.Settings.Default.NoHomeDir = NoHomeDir;
+            save_Settings();
         }
 
         private void checkBox12_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox12.Checked)
+            if (chkUnattended.Checked)
             {
                 Unattended = " -unattended";
             }
@@ -744,6 +905,8 @@ namespace UT3ServerManager
             {
                 Unattended = "";
             }
+            Properties.Settings.Default.Unattended = Unattended;
+            save_Settings();
         }
 
         private void button9_Click(object sender, EventArgs e)
@@ -828,22 +991,25 @@ namespace UT3ServerManager
 
         private void update_Mutator()
         {
+            if (!MutatorsCanRun) return; // TODO: dirty fix for some early morning logic flaw
             string buffer = "";
-            if (checkBox13.Checked) buffer += "UTGame.UTMutator_Instagib,";
-            if (checkBox14.Checked) buffer += "UTGame.UTMutator_BigHead,";
-            if (checkBox15.Checked) buffer += "UTGame.UTMutator_LowGrav,";
-            if (checkBox16.Checked) buffer += "UTGame.UTMutator_SuperBerserk,";
-            if (checkBox17.Checked) buffer += "UTGame.UTMutator_FriendlyFire,";
-            if (checkBox18.Checked) buffer += "UTGame.UTMutator_NoTranslocator,";
-            if (checkBox19.Checked) buffer += "UTGame.UTMutator_SpeedFreak,";
-            if (checkBox20.Checked) buffer += "UTGame.UTMutator_Handicap,";
-            if (checkBox21.Checked) buffer += "UTGame.UTMutator_NoPowerups,";
-            if (checkBox22.Checked) buffer += "UTGame.UTMutator_Slomo,";
-            if (checkBox23.Checked) buffer += "UTGame.UTMutator_WeaponReplacement,";
-            if (checkBox24.Checked) buffer += "UTGame.UTMutator_WeaponsRespawn";
+            if (chkInstagib.Checked) buffer += "UTGame.UTMutator_Instagib,";
+            if (chkBigHead.Checked) buffer += "UTGame.UTMutator_BigHead,";
+            if (chkLowGravity.Checked) buffer += "UTGame.UTMutator_LowGrav,";
+            if (chkSuperBerserk.Checked) buffer += "UTGame.UTMutator_SuperBerserk,";
+            if (chkFriendlyFire.Checked) buffer += "UTGame.UTMutator_FriendlyFire,";
+            if (chkNoTranslocator.Checked) buffer += "UTGame.UTMutator_NoTranslocator,";
+            if (chkSpeedFreak.Checked) buffer += "UTGame.UTMutator_SpeedFreak,";
+            if (chkHandicap.Checked) buffer += "UTGame.UTMutator_Handicap,";
+            if (chkNoPowerups.Checked) buffer += "UTGame.UTMutator_NoPowerups,";
+            if (chkSlomo.Checked) buffer += "UTGame.UTMutator_Slomo,";
+            if (chkWeaponReplacement.Checked) buffer += "UTGame.UTMutator_WeaponReplacement,";
+            if (chkWeaponRespawn.Checked) buffer += "UTGame.UTMutator_WeaponsRespawn";
             buffer = buffer.TrimEnd(',');
             buffer = "?mutator=" + buffer;
             Mutators = buffer;
+            Properties.Settings.Default.Mutators = Mutators;
+            save_Settings();
         }
         private void checkBox13_CheckedChanged(object sender, EventArgs e)
         {
@@ -902,6 +1068,7 @@ namespace UT3ServerManager
 
         private void checkBox24_CheckedChanged(object sender, EventArgs e)
         {
+            Console.WriteLine("Here: " + sender.GetType().Name);
             update_Mutator();
         }
 
@@ -921,6 +1088,8 @@ namespace UT3ServerManager
                     {
                         GamePath = fbd.SelectedPath;
                         textBox15.Text = GamePath;
+                        Properties.Settings.Default.GamePath = GamePath;
+                        save_Settings();
                         enable_Controls();
                         load_Maps();
                     }
@@ -941,15 +1110,17 @@ namespace UT3ServerManager
 
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
-            BotSkill = trackBar1.Value;
+            BotSkill = tbBotSkill.Value;
             label2.Text = "Bot skill (" + BotSkill + "/7)";
+            Properties.Settings.Default.BotSkill = BotSkill;
+            save_Settings();
         }
 
         private void start_Game()
         {
             ProcessStartInfo startInfo = new ProcessStartInfo(GamePath + @"\Binaries\UT3.exe");
             startInfo.WindowStyle = ProcessWindowStyle.Normal;
-            startInfo.Arguments = "-nostartupmovies";
+            startInfo.Arguments = "-nostartupmovies " + GameLaunchArguments;
             Process.Start(startInfo);
         }
         private void button14_Click(object sender, EventArgs e)
@@ -997,6 +1168,200 @@ namespace UT3ServerManager
             var myDocs = Path.Combine(Environment.ExpandEnvironmentVariables("%userprofile%"), "Documents");
             myDocs += @"\My Games\Unreal Tournament 3\UTGame\Unpublished\CookedPC\CustomMaps";
             Process.Start(myDocs);
+        }
+
+        private void button21_Click(object sender, EventArgs e)
+        {
+            kill_Game();
+        }
+
+        private void button18_Click_1(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\CookedPC\Private\Maps");
+        }
+
+        private void button17_Click_1(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\CookedPC\Maps");
+        }
+
+        private void button19_Click_1(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\CookedPC\UT3G\Maps");
+        }
+
+        private void button20_Click_1(object sender, EventArgs e)
+        {
+            var myDocs = Path.Combine(Environment.ExpandEnvironmentVariables("%userprofile%"), "Documents");
+            myDocs += @"\My Games\Unreal Tournament 3\UTGame\Unpublished\CookedPC\CustomMaps";
+            Process.Start(myDocs);
+        }
+
+        private void button3_Click_1(object sender, EventArgs e)
+        {
+            Clipboard.SetText(textBox5.Text);
+        }
+
+        private void checkBox25_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox25.Checked)
+            {
+                this.TopMost = true;
+            }
+            else
+            {
+                this.TopMost = false;
+            }
+            Properties.Settings.Default.TopMost = checkBox25.Checked;
+            save_Settings();
+        }
+
+        private void trackBar2_Scroll(object sender, EventArgs e)
+        {
+            this.Opacity = (double)trackBar2.Value / 100.0;
+            Properties.Settings.Default.Opacity = (double)trackBar2.Value;
+            save_Settings();
+        }
+
+        private void button30_Click(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\Config");
+        }
+
+        private void button25_Click(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\Config\UTEngine.ini");
+        }
+
+        private void button24_Click(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\Config\UTMapLists.ini");
+        }
+
+        private void button27_Click(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\Config\UTUI.ini");
+        }
+
+        private void button26_Click(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\Config\UTVote.ini");
+        }
+
+        private void button23_Click(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\Config\UTWeapons.ini");
+        }
+
+        private void button22_Click(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\Config\UTGame.ini");
+        }
+
+        private void button29_Click(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\Config\UTWeb.ini");
+        }
+
+        private void button28_Click(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\Config\UTCustomChar.ini");
+        }
+
+        private void button32_Click(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\Config\UTInput.ini");
+        }
+
+        private void button31_Click(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\Config\UTCompat.ini");
+        }
+
+        private void button34_Click(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\Config\UTEditor.ini");
+        }
+
+        private void button33_Click(object sender, EventArgs e)
+        {
+            Process.Start(GamePath + @"\UTGame\Config\UTEditorUserSettings.ini");
+        }
+
+        private void txtNumPlay_TextChanged(object sender, EventArgs e)
+        {
+            NumPlay = int.Parse(txtNumPlay.Text);
+            Properties.Settings.Default.NumPlay = NumPlay;
+            save_Settings();
+        }
+
+        private void chkUsesPresence_CheckedChanged(object sender, EventArgs e)
+        {
+            UsesPresence = chkUsesPresence.Checked;
+            Properties.Settings.Default.UsesPresence = UsesPresence;
+            save_Settings();
+        }
+
+        private void chkAllowJoinViaPresence_CheckedChanged(object sender, EventArgs e)
+        {
+            AllowJoinViaPresence = chkAllowJoinViaPresence.Checked;
+            Properties.Settings.Default.AllowJoinViaPresence = AllowJoinViaPresence;
+            save_Settings();
+        }
+
+        private void textBox15_TextChanged(object sender, EventArgs e)
+        {
+       
+        }
+
+        private void button36_Click(object sender, EventArgs e)
+        {
+            //Process.Start(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
+            Process.Start(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath);
+
+        }
+
+        private void button35_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath;   
+                if (File.Exists(config))
+                {
+                    File.Delete(config);
+                    Console.WriteLine("File deleted.");
+                }
+            }
+            catch (Exception ex)
+            {
+                log("Flushing config: " + ex.Message, "ERR");
+            }
+        }
+
+        private void textBox1_TextChanged_1(object sender, EventArgs e)
+        {
+            ServerInsideParameters = txtServerInsideParameters.Text;
+            Properties.Settings.Default.ServerInsideParameters = ServerInsideParameters;
+            save_Settings();
+        }
+
+        private void txtServerOutsideArguments_TextChanged(object sender, EventArgs e)
+        {
+            ServerOutsideArguments = txtServerOutsideArguments.Text;
+            Properties.Settings.Default.ServerOutsideArguments = ServerOutsideArguments;
+            save_Settings();
+        }
+
+        private void txtGameLaunchArguments_TextChanged(object sender, EventArgs e)
+        {
+            GameLaunchArguments = txtGameLaunchArguments.Text;
+            Properties.Settings.Default.GameLaunchArguments = GameLaunchArguments;
+            save_Settings();
+        }
+
+        private void button37_Click(object sender, EventArgs e)
+        {
+            start_Server(true);
         }
     }
 }

@@ -21,11 +21,19 @@ A quick and dirty PoC of UT3 server manager I did in a day, simply because there
 - Some useful tips like ports, admin commands and others (the little i buttons)
 - Overriding game mode for custom or vanilla maps
 - A nice little tray icon with a menu so you can hide the program
+- Open game configuration (.ini) files easily
+- Open all vanilla and custom map folders
+- Add custom parameters and arguments when starting the server
+- Add custom arguments when launching the game
+- Automatic save of all your settings
 
 ### Screenshots ###
 ![Screenshot1](/Screenshots/Screenshot_1.png?raw=true "Main form of UT3SM.")
 ![Screenshot2](/Screenshots/Screenshot_2.png?raw=true "Helpful tips and commands.")
 ![Screenshot3](/Screenshots/Screenshot_3.png?raw=true "Nice tray icon.")
+![Screenshot4](/Screenshots/Screenshot_4.png?raw=true "Folders and files.")
+![Screenshot5](/Screenshots/Screenshot_5.png?raw=true "Advanced tab.")
+![Screenshot6](/Screenshots/Screenshot_6.png?raw=true "About tab.")
 
 ### Installation ###
 No installation is needed, download the release or build it yourself. Executable can be placed anywhere.
@@ -44,6 +52,7 @@ Windows 10 Home x64
 ``` 
 
 ### Todo ###
+- Add presets feature to save different types of configurations so you do not have to configure everything when you want to play DM or a special type of WAR
 - Migrate everything to .NET Core.
 - Remove junk code.
 - Refactor to implement better coding standards and naming conventions.
@@ -56,7 +65,7 @@ Windows 10 Home x64
 - Make form scale well with virtual resolution.
 - Move all functions to seprate classes (one for general system calls and one for game specific needs).
 - Perhaps handle the UT3 window inside the form (redirect stdout, stderr) and add ability to inject commands.
-- Add custom parameters for server and game launch.
+- ~~Add custom parameters for server and game launch.~~
 
 ### Uninstall ###
 Delete the executable.
